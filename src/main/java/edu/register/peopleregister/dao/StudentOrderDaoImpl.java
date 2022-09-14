@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class StudentOrderDaoImpl implements StudentOrderDao {
 
     private static final String INSERT_ORDER =
-            "INSERT INTO public.jc_student_order(" +
+            "INSERT INTO jc_student_order(" +
                     "student_order_status, student_order_date, " +
                     "h_sur_name, h_given_name, h_patronymic, h_date_of_birth, " +
                     "h_passport_seria, h_passport_number, h_passport_date, " +
@@ -25,24 +25,24 @@ public class StudentOrderDaoImpl implements StudentOrderDao {
                     "w_given_name, w_patronymic, " +
                     "w_date_of_birth, w_passport_seria, w_passport_number, w_passport_date, " +
                     "w_passport_office_id, w_post_index, w_street_code, w_building, w_extension, " +
-                    "w_apartmnet, w_university_id, w_student_number, certificate_id, register_office_id, marriage_date)" +
+                    "w_apartmnet, w_university_id, w_student_number, certificate_id, register_office_id, marriage_date) " +
                     "VALUES (?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?, ?);";
+                    "?, ?, ?, ?, ?, ?, ?, ?); ";
 
     private static final String INSERT_CHILD =
-            "INSERT INTO public.jc_student_child(" +
+            "INSERT INTO jc_student_child(" +
             "student_order_id, c_sur_name, " +
                     "c_given_name, c_patronymic, c_date_of_birth, " +
                     "c_certificate_number, c_certificate_date, " +
                     "c_register_office_id, c_post_index, c_street_code, " +
-                    "c_building, c_extension, c_apartmnet)" +
+                    "c_building, c_extension, c_apartmnet) " +
             "VALUES (?, ?, ?, " +
                     "?, ?, ?, ?, " +
                     "?, ?, ?, ?, " +
-                    "?, ?);";
+                    "?, ?); ";
 
     public static final String SELECT_ORDERS =
             "SELECT so.*, ro.r_office_area_id, ro.r_office_name,  " +
@@ -54,7 +54,7 @@ public class StudentOrderDaoImpl implements StudentOrderDao {
                     "INNER JOIN jc_register_office ro ON ro.r_office_id = so.register_office_id " +
                     "INNER JOIN jc_passport_office po_h ON po_h.p_office_id = so.h_passport_office_id " +
                     "INNER JOIN jc_passport_office po_w ON po_w.p_office_id = so.w_passport_office_id " +
-                    "WHERE student_order_status = ? ORDER BY student_order_date LIMIT ?";
+                    "WHERE student_order_status = ? ORDER BY student_order_date LIMIT ? ";
 
     public static final String SELECT_CHILD =
             "SELECT soc.*, ro.r_office_area_id, ro.r_office_name " +
@@ -75,15 +75,10 @@ public class StudentOrderDaoImpl implements StudentOrderDao {
                     "INNER JOIN jc_passport_office po_w ON po_w.p_office_id = so.w_passport_office_id " +
                     "INNER JOIN jc_student_child soc ON soc.student_order_id = so.student_order_id " +
                     "INNER JOIN jc_register_office ro_c ON ro_c.r_office_id = soc.c_register_office_id " +
-                    "WHERE student_order_status = ? ORDER BY so.student_order_id LIMIT ?";
+                    "WHERE student_order_status = ? ORDER BY so.student_order_id LIMIT ? ";
 
-    //TODO refactoring make one method
     private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(
-                Config.getProperty(Config.DB_URL),
-                Config.getProperty(Config.DB_LOGIN),
-                Config.getProperty(Config.DB_PASSWORD)
-        );
+        return ConnectionBuilder.getConnection();
     }
 
     @Override
@@ -293,16 +288,14 @@ public class StudentOrderDaoImpl implements StudentOrderDao {
     }
 
     private void findChildren(Connection con, List<StudentOrder> result) throws SQLException {
-        String cl = "(" + result.stream()
-                .map(so -> String.valueOf(so.getStudentOrderId()))
+        String cl = "(" + result.stream().map(so -> String.valueOf(so.getStudentOrderId()))
                 .collect(Collectors.joining(",")) + ")";
 
-        Map<Long, StudentOrder> maps = result.stream()
-                .collect(Collectors.toMap(StudentOrder::getStudentOrderId, so -> so));
-
+        Map<Long, StudentOrder> maps = result.stream().collect(Collectors
+                .toMap(StudentOrder::getStudentOrderId, so -> so));
         try (PreparedStatement stmt = con.prepareStatement(SELECT_CHILD + cl)) {
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
+            while(rs.next()) {
                 Child ch = fillChild(rs);
                 StudentOrder so = maps.get(rs.getLong("student_order_id"));
                 so.addChildren(ch);

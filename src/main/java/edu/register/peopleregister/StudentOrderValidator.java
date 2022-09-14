@@ -1,11 +1,13 @@
 package edu.register.peopleregister;
 
+import edu.register.peopleregister.dao.StudentOrderDaoImpl;
 import edu.register.peopleregister.domain.*;
 import edu.register.peopleregister.domain.children.AnswerChildren;
 import edu.register.peopleregister.domain.register.AnswerCityRegister;
 import edu.register.peopleregister.domain.student.AnswerStudent;
 import edu.register.peopleregister.domain.wedding.AnswerWedding;
 import edu.register.peopleregister.exception.CityRegisterException;
+import edu.register.peopleregister.exception.DaoException;
 import edu.register.peopleregister.exception.TransportException;
 import edu.register.peopleregister.mail.MailSander;
 import edu.register.peopleregister.validator.*;
@@ -32,22 +34,19 @@ public class StudentOrderValidator {
 
     public static void main(String[] args) {
         StudentOrderValidator sov = new StudentOrderValidator();
-        try {
             sov.checkAll();
-        } catch (CityRegisterException e) {
-            e.printStackTrace();
-        } catch (TransportException e) {
-            e.printStackTrace();
-        }
-
     }
 
-    public void checkAll() throws TransportException, CityRegisterException {
+    public void checkAll() {
 
-        List<StudentOrder> soList = readStudentOrders();
+        try {
+            List<StudentOrder> soList = readStudentOrders();
 
-        for (StudentOrder so : soList) {
-            oneCheckOrder(so);
+            for (StudentOrder so : soList) {
+                oneCheckOrder(so);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
 //        for(StudentOrder so : soArray) {
@@ -56,14 +55,8 @@ public class StudentOrderValidator {
 //        }
     }
 
-    public List<StudentOrder> readStudentOrders() {
-        List<StudentOrder> soList = new LinkedList<>();
-
-        for(int i = 0; i < 5; i++) {
-            StudentOrder so = SaveStudentOrder.buildStudentOrder(i);
-            soList.add(so);
-        }
-        return soList;
+    public List<StudentOrder> readStudentOrders() throws DaoException {
+        return new StudentOrderDaoImpl().getStudentOrders();
     }
 
     public void oneCheckOrder(StudentOrder so) {
