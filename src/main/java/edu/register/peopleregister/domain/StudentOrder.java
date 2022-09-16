@@ -94,4 +94,19 @@ public class StudentOrder {
     public void setStudentOrderDate(LocalDateTime studentOrderDate) {
         this.studentOrderDate = studentOrderDate;
     }
+
+    @Override
+    public String toString() {
+        return "StudentOrder{" +
+                "studentOrderId=" + studentOrderId +
+                ", studentOrderStatus=" + studentOrderStatus +
+                ", studentOrderDate=" + studentOrderDate +
+                ", husband=" + husband +
+                ", wife=" + wife +
+                ", children=" + children +
+                ", marriageCertificateId='" + marriageCertificateId + '\'' +
+                ", marriageDate=" + marriageDate +
+                ", marriageOffice=" + marriageOffice +
+                '}';
+    }
 }

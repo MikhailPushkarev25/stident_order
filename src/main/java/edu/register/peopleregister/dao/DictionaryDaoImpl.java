@@ -6,12 +6,16 @@ import edu.register.peopleregister.domain.PassportOffice;
 import edu.register.peopleregister.domain.RegisterOffice;
 import edu.register.peopleregister.domain.Street;
 import edu.register.peopleregister.exception.DaoException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
 public class DictionaryDaoImpl implements DictionaryDao {
+
+    private static final Logger logger = LoggerFactory.getLogger(DictionaryDaoImpl.class);
 
     private static final String GET_STREET = "SELECT street_code, street_name FROM " +
             " jc_street WHERE UPPER(street_name) LIKE UPPER(?)";
@@ -40,6 +44,7 @@ public class DictionaryDaoImpl implements DictionaryDao {
                 result.add(str);
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
             throw new DaoException(e);
         }
         return result;
@@ -62,6 +67,7 @@ public class DictionaryDaoImpl implements DictionaryDao {
                 result.add(str);
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
             throw new DaoException(e);
         }
         return result;
@@ -84,6 +90,7 @@ public class DictionaryDaoImpl implements DictionaryDao {
                 result.add(str);
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
             throw new DaoException(e);
         }
         return result;
@@ -107,6 +114,7 @@ public class DictionaryDaoImpl implements DictionaryDao {
                 result.add(str);
             }
         } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
             throw new DaoException(e);
         }
         return result;
